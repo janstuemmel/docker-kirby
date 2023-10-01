@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+for p in "$@"; do
+  plugin=(${p//\@/ })
+
+  if [ -z "${plugin[1]}" ]; then
+    URL=https://api.github.com/repos/${plugin[0]}/zipball
+  else
+    URL="https://codeload.github.com/${plugin[0]}/zip/${plugin[1]}"
+  fi
+  echo Installing kirby plugin \"$p\"
+  wget -qq $URL -O plugin.zip && unzip -oq plugin.zip -d site/plugins && rm plugin.zip
+done
