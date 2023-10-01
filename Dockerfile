@@ -9,7 +9,8 @@ RUN wget -O /usr/local/bin/caddy "https://caddyserver.com/api/download?os=linux&
 
 COPY php.ini /usr/local/etc/php/conf.d/settings.ini
 COPY Caddyfile /etc/Caddyfile
-COPY install-plugins.sh /usr/local/bin
+COPY kirby-plugins /usr/local/bin
+COPY kirby-install /usr/local/bin
 
 RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
   && mkdir -p /app && chown app -R /app
@@ -17,18 +18,7 @@ RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
 USER app
 WORKDIR /app
 
-ARG KIRBY_VERSION="main"
-ARG KIRBY_PLUGINS=""
-
-RUN wget -O kirby.zip https://codeload.github.com/getkirby/plainkit/zip/$KIRBY_VERSION
-RUN ls . -a
-RUN unzip kirby.zip -d . \
-  && rm kirby.zip \
-  && mv plainkit-$KIRBY_VERSION kirby
-
-WORKDIR /app/kirby
-
-RUN install-plugins.sh $KIRBY_PLUGINS
+RUN kirby-install main
 
 VOLUME /app/kirby/media
 VOLUME /app/kirby/content

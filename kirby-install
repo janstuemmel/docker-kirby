@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+rm -rf kirby
+
+if [ -z "$1" ]; then
+  echo no version selected
+  exit 1
+fi
+
+wget -O kirby.zip https://codeload.github.com/getkirby/plainkit/zip/$1 \
+  && unzip kirby.zip -d . \
+  && rm kirby.zip \
+  && mv plainkit-$1 kirby
