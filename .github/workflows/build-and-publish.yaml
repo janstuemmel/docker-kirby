@@ -1,0 +1,29 @@
+name: Build and publish
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - 'main'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build_publish:
+    name: Build and publish docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build docker image
+        run: |
+          docker build . --tag ghcr.io/janstuemmel/kirby:latest
+          docker push ghcr.io/janstuemmel/kirby:latest
