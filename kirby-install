@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
-rm -rf kirby
+shopt -s dotglob
+rm -rf .
 
 if [ -z "$1" ]; then
   echo no version selected
@@ -10,4 +10,5 @@ fi
 wget -O /tmp/kirby.zip https://codeload.github.com/getkirby/plainkit/zip/$1 \
   && unzip /tmp/kirby.zip -d /tmp/kirby \
   && rm /tmp/kirby.zip \
-  && mv /tmp/kirby/plainkit-$1/* ./
+  && mv /tmp/kirby/plainkit-$1/* ./ \
+  && rm -rf /tmp/kirby

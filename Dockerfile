@@ -11,18 +11,16 @@ COPY php.ini /usr/local/etc/php/conf.d/settings.ini
 COPY Caddyfile /etc/Caddyfile
 COPY kirby-plugins /usr/local/bin
 COPY kirby-install /usr/local/bin
+COPY index.php /app/public/
 
 RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
-  && mkdir -p /app && chown app -R /app
+  && mkdir -p /app && chown app.app -R /app
 
 USER app
 WORKDIR /app
 
-RUN mkdir public
-
+RUN mkdir -p public/media storage
 RUN kirby-install main
-
-COPY index.php public/
 
 VOLUME /app/public/media
 VOLUME /app/content
