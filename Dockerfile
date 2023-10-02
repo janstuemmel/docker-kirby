@@ -18,10 +18,14 @@ RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
 USER app
 WORKDIR /app
 
+RUN mkdir public
+
 RUN kirby-install main
 
-VOLUME /app/kirby/media
-VOLUME /app/kirby/content
-VOLUME /app/kirby/site/accounts
+COPY index.php public/
+
+VOLUME /app/public/media
+VOLUME /app/content
+VOLUME /app/storage
 
 CMD ["caddy", "run", "--config", "/etc/Caddyfile"]

@@ -11,5 +11,5 @@ for p in "$@"; do
     URL="https://codeload.github.com/${plugin[0]}/zip/${plugin[1]}"
   fi
   echo Installing kirby plugin \"$p\"
-  wget -qq $URL -O plugin.zip && unzip -oq plugin.zip -d kirby/site/plugins && rm plugin.zip
+  wget -qq $URL -O plugin.zip && unzip -oq plugin.zip -d site/plugins && rm plugin.zip
 done
