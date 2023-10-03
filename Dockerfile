@@ -4,14 +4,16 @@ RUN apk add --update --no-cache freetype-dev libzip-dev zlib git libjpeg-turbo-d
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j$(nproc) gd exif zip
 
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 RUN wget -O /usr/local/bin/caddy "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com%2Fbaldinof%2Fcaddy-supervisor" \
   && chmod +x /usr/local/bin/caddy
 
 COPY php.ini /usr/local/etc/php/conf.d/settings.ini
 COPY Caddyfile /etc/Caddyfile
 COPY kirby-plugins /usr/local/bin
-COPY kirby-install /usr/local/bin
 COPY index.php /app/public/
+COPY composer.json /app/composer.json
 
 RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
   && mkdir -p /app && chown app.app -R /app
@@ -19,11 +21,6 @@ RUN addgroup app && adduser -S -u 1000 -s /bin/bash app -G app \
 USER app
 WORKDIR /app
 
-RUN mkdir -p public/media storage
-RUN kirby-install main
-
-VOLUME /app/public/media
-VOLUME /app/content
-VOLUME /app/storage
+RUN composer require getkirby/cms:^3
 
 CMD ["caddy", "run", "--config", "/etc/Caddyfile"]
