@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-mkdir -p kirby/site/plugins
-
 for p in "$@"; do
   plugin=(${p//\@/ })
 
