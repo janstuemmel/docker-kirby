@@ -1,6 +1,6 @@
 FROM php:8.2-fpm-alpine
 
-RUN apk add --update --no-cache freetype-dev libzip-dev zlib git libjpeg-turbo-dev bash libpng-dev \
+RUN apk add --update --no-cache freetype-dev libzip-dev zlib git php82-sqlite3 sqlite libjpeg-turbo-dev bash libpng-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j$(nproc) gd exif zip
 
