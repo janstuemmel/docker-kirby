@@ -1,6 +1,12 @@
 # docker kirby
 
-a docker container with kirby installed on `php:8.2-fpm-alpine` and `caddy`.
+a docker container with kirby installed on patched `php:8.2.35-fpm-alpine` and `caddy`.
+
+## PHP security maintenance
+
+The image disables `session.upload_progress` as an additional PHP2Shell mitigation. PHP 8.2 reaches the end of security support on December 31, 2026, so this patch is not a substitute for planning a PHP upgrade.
+
+After this image change is merged and published, rebuild and deploy dependent images such as `janstuemmel/fsm`; existing images and running containers do not inherit updates automatically.
 
 It is a [kirby public folder](https://getkirby.com/docs/guide/configuration#custom-folder-setup__public-folder-setup) setup: 
 

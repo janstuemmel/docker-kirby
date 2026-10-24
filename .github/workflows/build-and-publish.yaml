@@ -1,5 +1,6 @@
 name: Build and publish
 on:
+  pull_request:
   push:
     tags:
       - '*'
@@ -7,7 +8,7 @@ on:
       - 'main'
 
 permissions:
-  contents: write
+  contents: read
   packages: write
 
 jobs:
@@ -17,13 +18,33 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Build docker image
+        run: |
+          docker build --pull \
+            --tag ghcr.io/janstuemmel/kirby:latest \
+            --tag ghcr.io/janstuemmel/kirby:8.2.35 \
+            .
+
+      - name: Verify PHP, extensions, and runtime configuration
+        run: |
+          docker run --rm -i --entrypoint sh ghcr.io/janstuemmel/kirby:8.2.35 -s <<'EOF'
+          set -eu
+          php -r 'if (PHP_VERSION_ID < 80235 || PHP_VERSION_ID >= 80300) { fwrite(STDERR, "Unexpected PHP version: " . PHP_VERSION . PHP_EOL); exit(1); } foreach (["gd", "exif", "zip", "sqlite3", "pdo_sqlite"] as $extension) { if (!extension_loaded($extension)) { fwrite(STDERR, "Missing extension: " . $extension . PHP_EOL); exit(1); } } if (filter_var(ini_get("session.upload_progress.enabled"), FILTER_VALIDATE_BOOLEAN)) { fwrite(STDERR, "Upload progress is not disabled" . PHP_EOL); exit(1); }'
+          php-fpm -tt
+          caddy validate --config /etc/Caddyfile --adapter caddyfile
+          test -f /app/vendor/autoload.php
+          php -r 'require "/app/vendor/autoload.php"; if (!class_exists("Kirby")) { fwrite(STDERR, "Kirby autoloader is unavailable" . PHP_EOL); exit(1); }'
+          EOF
+
       - uses: docker/login-action@v2
+        if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build docker image
+      - name: Publish docker image
+        if: github.event_name != 'pull_request'
         run: |
-          docker build . --tag ghcr.io/janstuemmel/kirby:latest
+          docker push ghcr.io/janstuemmel/kirby:8.2.35
           docker push ghcr.io/janstuemmel/kirby:latest

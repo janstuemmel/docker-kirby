@@ -1,6 +1,8 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2.35-fpm-alpine@sha256:62acd0827698068d9605bf236fb2fc3c0b10052fd98974d7e9b3ab05ae7291ca
 
-RUN apk add --update --no-cache freetype-dev libzip-dev zlib git php82-sqlite3 sqlite libjpeg-turbo-dev bash libpng-dev \
+RUN php -r 'if (PHP_VERSION_ID < 80235 || PHP_VERSION_ID >= 80300) { fwrite(STDERR, "Expected patched PHP 8.2.35+, got " . PHP_VERSION . PHP_EOL); exit(1); }'
+
+RUN apk add --update --no-cache freetype-dev libzip-dev zlib git sqlite libjpeg-turbo-dev bash libpng-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j$(nproc) gd exif zip
 
